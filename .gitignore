@@ -1,0 +1,74 @@
+# ==========================================
+# VIRTUAL ENVIRONMENT
+# ==========================================
+venv/
+env/
+.env/
+.venv/
+
+# ==========================================
+# PYTHON
+# ==========================================
+# Bytecode
+__pycache__/
+*.py[cod]
+*$py.class
+*.pyc
+
+# Distribution / packaging
+*.egg-info/
+*.egg
+dist/
+build/
+.eggs/
+
+# ==========================================
+# PYENV & PROJECT CONFIG
+# ==========================================
+.python-version
+
+# ==========================================
+# PYPROJECT / BUILD TOOLS
+# ==========================================
+# Giữ lại pyproject.toml (cần commit)
+# Bỏ qua file lock nếu không dùng
+# poetry.lock  ← bỏ comment nếu muốn ignore
+
+# ==========================================
+# IDE / EDITOR
+# ==========================================
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+
+# ==========================================
+# OS
+# ==========================================
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# ==========================================
+# LOGS & TMP
+# ==========================================
+*.log
+*.tmp
+logs/
+learning/phase_0/tmp.txt   # hoặc **/tmp.txt
+
+# ==========================================
+# CRAWLER OUTPUT (nếu có)
+# ==========================================
+*.json
+*.csv
+output/
+data/
+
+# ==========================================
+# SECRETS / ENV VARS
+# ==========================================
+.env
+.env.*
+secrets.py
+config/local_settings.py
