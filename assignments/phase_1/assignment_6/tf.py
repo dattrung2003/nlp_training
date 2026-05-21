@@ -1,47 +1,88 @@
-import re
+from collections import Counter
 
-def clean_and_tokenize(text):
-    text = text.lower()
-    return re.findall(r'\b\w+\b', text)
+def tokenize(text: str) -> list[str]:
+    return text.lower().split()
 
-def compute_term_frequency(corpus):
-    tokenized_corpus = [clean_and_tokenize(doc) for doc in corpus]
-    
-    unique_words = set(word for doc in tokenized_corpus for word in doc)
-    vocabulary = sorted(list(unique_words))
-    
-    tf_matrix = []
-    for doc in tokenized_corpus:
-        total_words_in_doc = len(doc)
-        
-        if total_words_in_doc == 0:
-            tf_matrix.append([0.0] * len(vocabulary))
-            continue
-            
-        word_counts = {}
-        for word in doc:
-            word_counts[word] = word_counts.get(word, 0) + 1
-            
-        doc_tf_vector = []
-        for word in vocabulary:
-            count = word_counts.get(word, 0)
-            tf_value = count / total_words_in_doc
-            doc_tf_vector.append(round(tf_value, 4)) 
-            
-        tf_matrix.append(doc_tf_vector)
-        
-    return tf_matrix, vocabulary
 
-# --- Test ---
-corpus = [
-    "The cat sat on the mat",
-    "The dog chased the cat"
-]
+def raw_count(document: str) -> dict[str, int]:
+    return dict(Counter(tokenize(document)))
 
-tf_matrix, vocabulary = compute_term_frequency(corpus)
 
-print("Vocabulary:")
-print(vocabulary)
-print("\nTerm Frequency (TF) Matrix:")
-for i, vector in enumerate(tf_matrix):
-    print(f"Doc {i+1}: {vector}")
+def term_frequency(document: str) -> dict[str, float]:
+    tokens = tokenize(document)
+    total  = len(tokens)
+
+    if total == 0:
+        return {}
+
+    counts = Counter(tokens)
+    return {term: count / total for term, count in counts.items()}
+
+
+def compare(document: str) -> None:
+    tokens  = tokenize(document)
+    total   = len(tokens)
+    counts  = raw_count(document)
+    tf      = term_frequency(document)
+
+    col = 10   
+
+    print(f"\n  Document : \"{document}\"")
+    print(f"  Tokens   : {tokens}")
+    print(f"  Total    : {total}\n")
+
+    header = f"  {'Term':<{col}} {'Raw Count':>{col}} {'TF (norm)':>{col}}"
+    div    = "  " + "─" * (len(header) - 2)
+
+    print(div)
+    print(f"  {'Term':<{col}} {'Raw Count':>{col}} {'Normalized TF':>{col}}")
+    print(div)
+
+    for term in counts:                     
+        raw = counts[term]
+        tf_val = tf[term]
+        bar = "█" * raw                       
+        print(f"  {term:<{col}} {raw:>{col}}     {tf_val:>{col}.4f}   {bar}")
+
+    print(div)
+    total_tf = sum(tf.values())
+    print(f"  {'TOTAL':<{col}} {total:>{col}}     {total_tf:>{col}.4f}   ← always sums to 1.0\n")
+
+
+# Main
+
+if __name__ == "__main__":
+    document = "NLP NLP is fun"
+
+    tf = term_frequency(document)
+    print("\n📐 TF Result:")
+    print(f"  {tf}")
+
+    print("\n📊 Raw Count vs Normalized TF:")
+    compare(document)
+
+    print("─" * 55)
+    print("  Effect of document length on raw count vs TF\n")
+    print("  Same topic, different lengths — TF stays stable:\n")
+
+    docs = {
+        "short"  : "NLP is fun",
+        "medium" : "NLP NLP is fun",
+        "long"   : "NLP NLP NLP NLP is fun fun fun fun fun",
+    }
+
+    col = 8
+    print(f"  {'Doc':<8} {'nlp raw':>{col}} {'nlp TF':>{col}}   {'fun raw':>{col}} {'fun TF':>{col}}")
+    print("  " + "─" * 48)
+    for label, doc in docs.items():
+        rc = raw_count(doc)
+        tf = term_frequency(doc)
+        print(
+            f"  {label:<8}"
+            f" {rc.get('nlp', 0):>{col}}"
+            f" {tf.get('nlp', 0.0):>{col}.4f}"
+            f"   {rc.get('fun', 0):>{col}}"
+            f" {tf.get('fun', 0.0):>{col}.4f}"
+        )
+    print()
+    print("  ↑ Raw count grows with length; TF reflects true proportion.\n")
